@@ -38,9 +38,30 @@ This plugin is configured using `metadata.json` (or `metadata.yaml`). Add a bloc
 }
 ```
 
-Any tables that do not create will be created when Datasette first starts.
+Any tables that do not yet exist will be created when Datasette first starts.
 
-Valid column types are `"integer"`, `"text"`, `"float"` and `"blob"`. The `"pk"` is optional.
+Valid column types are `"integer"`, `"text"`, `"float"` and `"blob"`.
+
+The `"pk"` is optional, and is used to define the primary key.
+
+The plugin can also be used to create views:
+
+```json
+{
+  "plugins": {
+    "datasette-init": {
+      "my_database": {
+        "views": {
+          "my_view": "select 1 + 1"
+        }
+      }
+    }
+  }
+}
+```
+
+Each view in the ``"views"`` block will be created when the Database first starts. If a view with the same name already exists it will be replaced with the new definition.
+
 
 ## Development
 

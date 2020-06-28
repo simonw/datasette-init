@@ -50,3 +50,28 @@ async def test_ignore_if_table_already_exists(tmp_path_factory):
         db_init=lambda db: db["dogs"].create({"id": int}),
     )
     await ds.invoke_startup()
+
+
+@pytest.mark.asyncio
+async def test_views(tmp_path_factory):
+    ds = build_datasette(tmp_path_factory, {"views": {"two": "select 1 + 1"}})
+    await ds.invoke_startup()
+    async with httpx.AsyncClient(app=ds.app()) as client:
+        response = await client.get("http://localhost/test/two.json?_shape=array")
+        assert 200 == response.status_code
+        assert [{"1 + 1": 2}] == response.json()
+
+
+@pytest.mark.asyncio
+async def test_replace_view_if_already_exists(tmp_path_factory):
+    ds = build_datasette(
+        tmp_path_factory,
+        {"views": {"two": "select 1 + 1"}},
+        db_init=lambda db: db.create_view("two", "select 1 + 3"),
+    )
+    async with httpx.AsyncClient(app=ds.app()) as client:
+        response = await client.get("http://localhost/test/two.json?_shape=array")
+        assert [{"1 + 3": 4}] == response.json()
+        await ds.invoke_startup()
+        response2 = await client.get("http://localhost/test/two.json?_shape=array")
+        assert [{"1 + 1": 2}] == response2.json()
