@@ -53,6 +53,28 @@ async def test_ignore_if_table_already_exists(tmp_path_factory):
 
 
 @pytest.mark.asyncio
+async def test_tables_compound_primary_key(tmp_path_factory):
+    ds = build_datasette(
+        tmp_path_factory,
+        {
+            "tables": {
+                "dogs": {
+                    "columns": {"id1": "integer", "id2": "integer", "name": "text",},
+                    "pk": ["id1", "id2"],
+                }
+            }
+        },
+    )
+    await ds.invoke_startup()
+    async with httpx.AsyncClient(app=ds.app()) as client:
+        response = await client.get("http://localhost/test/dogs.json")
+        assert 200 == response.status_code
+        data = response.json()
+        assert ["id1", "id2", "name"] == data["columns"]
+        assert ["id1", "id2"] == data["primary_keys"]
+
+
+@pytest.mark.asyncio
 async def test_views(tmp_path_factory):
     ds = build_datasette(tmp_path_factory, {"views": {"two": "select 1 + 1"}})
     await ds.invoke_startup()

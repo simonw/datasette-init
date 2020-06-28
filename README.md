@@ -14,7 +14,11 @@ Install this plugin in the same environment as Datasette.
 
 ## Usage
 
-This plugin is configured using `metadata.json` (or `metadata.yaml`). Add a block like this that specifies the tables you would like to ensure exist:
+This plugin is configured using `metadata.json` (or `metadata.yaml`). 
+
+### Creating tables
+
+Add a block like this that specifies the tables you would like to ensure exist:
 
 ```json
 {
@@ -42,7 +46,12 @@ Any tables that do not yet exist will be created when Datasette first starts.
 
 Valid column types are `"integer"`, `"text"`, `"float"` and `"blob"`.
 
-The `"pk"` is optional, and is used to define the primary key.
+The `"pk"` is optional, and is used to define the primary key. To define a compound primary key (across more than one column) use a list of column names here:
+```json
+    "pk": ["id1", "id2"]
+```
+
+### Creating views
 
 The plugin can also be used to create views:
 
