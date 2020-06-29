@@ -97,3 +97,11 @@ async def test_replace_view_if_already_exists(tmp_path_factory):
         await ds.invoke_startup()
         response2 = await client.get("http://localhost/test/two.json?_shape=array")
         assert [{"1 + 1": 2}] == response2.json()
+
+
+@pytest.mark.asyncio
+async def test_no_error_if_no_metadata():
+    ds = Datasette([], memory=True)
+    await ds.invoke_startup()
+    async with httpx.AsyncClient(app=ds.app()) as client:
+        assert 200 == (await client.get("http://localhost/")).status_code

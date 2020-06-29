@@ -6,6 +6,8 @@ import sqlite_utils
 def startup(datasette):
     async def inner():
         config = datasette.plugin_config("datasette-init")
+        if not config:
+            return
         for database_name, db_details in config.items():
             database = datasette.get_database(database_name)
 
