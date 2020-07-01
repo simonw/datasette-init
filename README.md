@@ -31,7 +31,7 @@ Add a block like this that specifies the tables you would like to ensure exist:
               "id": "integer",
               "name": "text",
               "age": "integer",
-              "weight": "float",
+              "weight": "float"
             },
             "pk": "id"
           }
